@@ -49,7 +49,7 @@ const RSVPForm = () => {
                 scale: 0.9, duration: 0.1, yoyo: true, repeat: 1
             });
 
-            const response = await axios.post('http://localhost:5000/api/rsvp', formData);
+            const response = await axios.post('https://holi-invitation-b1g8.onrender.com', formData);
             
             setStatus({ type: 'success', message: 'Thank you for your RSVP! A confirmation email has been sent.' });
             setFormData({ name: '', email: '', guests: 1, message: '' });
