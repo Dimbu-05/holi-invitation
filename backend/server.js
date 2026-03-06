@@ -36,9 +36,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Nodemailer Setup
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // use TLS
+    service:"gmail",
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS // The app password goes in .env
