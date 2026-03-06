@@ -62,7 +62,7 @@ app.post("/api/rsvp", (req, res) => {
 
         // Send confirmation email
         const mailOptions = {
-            from: "exampleone919@gmail.com",
+            from: process.env.EMAIL_USER,
             to: email,
             subject: "Happy Holi – Invitation Confirmation",
             text: `Dear ${name},
