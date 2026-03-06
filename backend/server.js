@@ -40,7 +40,7 @@ const transporter = nodemailer.createTransport({
     port: 587,
     secure: false, // use TLS
     auth: {
-        user: "exampleone919@gmail.com",
+        user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS // The app password goes in .env
     }
 });
