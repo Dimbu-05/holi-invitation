@@ -81,20 +81,6 @@ Best Regards,
 Holi Celebration Team`,
             });
 
-            /* -------- EMAIL TO HOST (OPTIONAL) -------- */
-
-            await resend.emails.send({
-                from: "Holi Invitation <onboarding@resend.dev>",
-                to: process.env.EMAIL_USER,
-                subject: "New RSVP Received 🎉",
-                text: `New RSVP received:
-
-Name: ${name}
-Email: ${email}
-Guests: ${guests}
-Message: ${message || "None"}`,
-            });
-
             console.log("Emails sent successfully");
 
             res.status(200).json({
