@@ -57,13 +57,13 @@ app.post("/api/rsvp", async (req, res) => {
         }
 
         try {
-            /* -------- EMAIL TO GUEST -------- */
 
-            await resend.emails.send({
-                from: "Holi Invitation <onboarding@resend.dev>",
-                to: email,
-                subject: "Happy Holi – Invitation Confirmation",
-                text: `Dear ${name},
+    // Email to guest
+    await resend.emails.send({
+        from: "Holi Invitation <onboarding@resend.dev>",
+        to: email,
+        subject: "Happy Holi – Invitation Confirmation",
+        text: `Dear ${name},
 
 Thank you for confirming your presence at our Holi Celebration.
 We are delighted to have you join us along with ${guests} guest(s).
@@ -75,26 +75,32 @@ Date: March 14, 2026
 Time: 10:00 AM onwards
 Venue: Festivity Grounds, Hyderabad
 
-Wishing you a colorful and joyful Holi! 🎨
+Wishing you a colorful, joyful, and memorable Holi! 🎨
 
 Best Regards,
-Holi Celebration Team`,
-            });
-
-            console.log("Emails sent successfully");
-
-            res.status(200).json({
-                id: this.lastID,
-                message: "RSVP successful. Confirmation email sent!",
-            });
-        } catch (error) {
-            console.error("Email sending error:", error);
-
-            res.status(500).json({
-                error: "RSVP saved but email could not be sent",
-            });
-        }
+Holi Celebration Team`
     });
+
+    // Email to host
+    await resend.emails.send({
+        from: "Holi Invitation <onboarding@resend.dev>",
+        to: process.env.EMAIL_USER,
+        subject: "New RSVP Received 🎉",
+        text: `New RSVP Received:
+
+Name: ${name}
+Email: ${email}
+Guests: ${guests}
+Message: ${message || "No message"}
+
+Submitted at: ${new Date().toLocaleString()}`
+    });
+
+    console.log("Emails sent successfully");
+
+} catch (error) {
+    console.error("Error sending email:", error);
+}
 });
 
 /* ---------------- SERVER ---------------- */
