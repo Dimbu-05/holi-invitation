@@ -4,7 +4,7 @@ import './CountdownTimer.css';
 // Target date: Next Holi (adjust as needed, let's use a sample future date)
 // Let's set it to some days from now to ensure it always shows something interesting.
 // In reality, Holi is calculated by lunar calendar. Let's use March 14, 2026.
-const TARGET_DATE = new Date('March 14, 2026 10:00:00').getTime();
+const TARGET_DATE = new Date('March 22, 2027 10:00:00').getTime();
 
 const CountdownTimer = ({ onComplete }) => {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
