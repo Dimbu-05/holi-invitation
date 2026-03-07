@@ -41,25 +41,24 @@ const db = new sqlite3.Database(dbPath, (err) => {
 /* ---------------- RSVP API ---------------- */
 
 app.post("/api/rsvp", async (req, res) => {
-    const { name, email, guests, message } = req.body;
+  const { name, email, guests, message } = req.body;
 
-    if (!name || !email || !guests) {
-        return res.status(400).json({ error: "Missing required fields" });
+  if (!name || !email || !guests) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const sql =
+    "INSERT INTO rsvps (name, email, guests, message) VALUES (?, ?, ?, ?)";
+
+  db.run(sql, [name, email, guests, message], async function (err) {
+    if (err) {
+      console.error("Database insert error:", err.message);
+      return res.status(500).json({ error: "Failed to save RSVP" });
     }
 
-    const sql =
-        "INSERT INTO rsvps (name, email, guests, message) VALUES (?, ?, ?, ?)";
-
-    db.run(sql, [name, email, guests, message], async function (err) {
-        if (err) {
-            console.error("Database insert error:", err.message);
-            return res.status(500).json({ error: "Failed to save RSVP" });
-        }
-
-        try {
-
-    // Email to guest
-    await resend.emails.send({
+    try {
+      // Email to guest
+      await resend.emails.send({
         from: "Holi Invitation <onboarding@resend.dev>",
         to: email,
         subject: "Happy Holi – Invitation Confirmation",
@@ -78,11 +77,11 @@ Venue: Festivity Grounds, Hyderabad
 Wishing you a colorful, joyful, and memorable Holi! 🎨
 
 Best Regards,
-Holi Celebration Team`
-    });
+Holi Celebration Team`,
+      });
 
-    // Email to host
-    await resend.emails.send({
+      // Email to host
+      await resend.emails.send({
         from: "Holi Invitation <onboarding@resend.dev>",
         to: process.env.EMAIL_USER,
         subject: "New RSVP Received 🎉",
@@ -93,14 +92,23 @@ Email: ${email}
 Guests: ${guests}
 Message: ${message || "No message"}
 
-Submitted at: ${new Date().toLocaleString()}`
-    });
+Submitted at: ${new Date().toLocaleString()}`,
+      });
 
-    console.log("Emails sent successfully");
+      console.log("Emails sent successfully");
 
-} catch (error) {
-    console.error("Error sending email:", error);
-}
+      res.status(200).json({
+        message: "RSVP saved successfully",
+        id: this.lastID,
+      });
+
+    } catch (error) {
+      console.error("Error sending email:", error);
+      res.status(500).json({
+        error: "RSVP saved but email failed",
+      });
+    }
+  });
 });
 
 /* ---------------- SERVER ---------------- */
