@@ -38,15 +38,16 @@ const db = new sqlite3.Database(dbPath, (err) => {
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
-    secure: true, // SSL
+    secure: true,
+    family: 4,   // force IPv4 instead of IPv6
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS // The app password goes in .env
+        pass: process.env.EMAIL_PASS
     }
 });
 
 // RSVP Endpoint
-app.post("/api/rsvp", (req, res) => {
+app.post("/api/rsvp", async (req, res) => {
     const { name, email, guests, message } = req.body;
 
     if (!name || !email || !guests) {
@@ -54,46 +55,49 @@ app.post("/api/rsvp", (req, res) => {
     }
 
     const sql = `INSERT INTO rsvps (name, email, guests, message) VALUES (?, ?, ?, ?)`;
-    db.run(sql, [name, email, guests, message], function (err) {
+
+    db.run(sql, [name, email, guests, message], async function (err) {
         if (err) {
             console.error("Database insert error:", err.message);
             return res.status(500).json({ error: "Failed to save RSVP." });
         }
 
-        // Send confirmation email
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Happy Holi – Invitation Confirmation",
             text: `Dear ${name},
 
-                Thank you for confirming your presence at our Holi Celebration. We are delighted to have you join us along with ${guests} guest(s).
-
-                ${message ? `Important Message: "${message}"
-
-            ` : ''}We look forward to celebrating the vibrant festival of colors with you. Your presence will surely make the event even more joyful and memorable.
-
+                Thank you for confirming your presence at our Holi Celebration.
+                We are delighted to have you join us along with ${guests} guest(s).
+                
+                ${message ? `Important Message: "${message}"\n\n` : ""}
+                
                 Event Details:
                 Date: March 14, 2026
                 Time: 10:00 AM onwards
                 Venue: Festivity Grounds, Hyderabad
-
-                Wishing you a colorful, joyful, and memorable Holi! 🎨
-
-                Best Regards,  
-                Holi Celebration Team`
+                
+                Wishing you a colorful Holi! 🎨
+`
         };
 
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error("Error sending email:", error);
-                // We don't fail the request since RSVP was saved, but we log the error
-            } else {
-                console.log("Email sent: " + info.response);
-            }
-        });
+        try {
+            const info = await transporter.sendMail(mailOptions);
+            console.log("Email sent:", info.response);
 
-        res.status(200).json({ id: this.lastID, message: "RSVP successful. Confirmation email sent!" });
+            res.status(200).json({
+                id: this.lastID,
+                message: "RSVP successful. Confirmation email sent!"
+            });
+
+        } catch (error) {
+            console.error("Error sending email:", error);
+
+            res.status(500).json({
+                error: "RSVP saved but email could not be sent."
+            });
+        }
     });
 });
 
