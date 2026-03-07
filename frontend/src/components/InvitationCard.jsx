@@ -34,6 +34,12 @@ const InvitationCard = () => {
     }
   };
 
+
+  const redirectToMap=()=>{
+    const url = 'https://maps.app.goo.gl/ujeowdDtEjqeADFi9'; 
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
   return (
     <section className="invitation-section">
       <div className="marigold-border top"></div>
@@ -57,9 +63,9 @@ const InvitationCard = () => {
               <span className="icon">⏰</span>
               <p>10:00 AM Onwards</p>
             </div>
-            <div className="detail-item">
+            <div className="detail-item" onClick={redirectToMap} style={{ cursor: "pointer" }} >
               <span className="icon">📍</span>
-              <p>Festivity Grounds, Guntur</p>
+              <p>Gunta Grounds, Guntur</p>
             </div>
           </div>
 
