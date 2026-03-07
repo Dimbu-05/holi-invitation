@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import gsap from 'gsap';
+import emailjs from '@emailjs/browser';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './RSVPForm.css';
 
@@ -49,26 +50,56 @@ const RSVPForm = () => {
                 scale: 0.9, duration: 0.1, yoyo: true, repeat: 1
             });
 
-            const response = await axios.post('https://holi-invitation-e1co.onrender.com/api/rsvp', formData);
-            
-            setStatus({ type: 'success', message: 'Thank you for your RSVP! A confirmation email has been sent.' });
+            // 1️⃣ Save RSVP in backend
+            await axios.post(
+                'https://holi-invitation-e1co.onrender.com/api/rsvp',
+                formData
+            );
+
+            // 2️⃣ Send email using EmailJS
+            await emailjs.send(
+                "service_pgojtqu",       // your EmailJS Service ID
+                "template_ixzlmck",      // your EmailJS Template ID
+                {
+                    name: formData.name,
+                    email: formData.email,
+                    guests: formData.guests,
+                    message: formData.message
+                },
+                "V6zk4H3MACGChjlyE"         // your EmailJS Public Key
+            );
+
+            setStatus({
+                type: 'success',
+                message: 'Thank you for your RSVP! A confirmation email has been sent.'
+            });
+
             setFormData({ name: '', email: '', guests: 1, message: '' });
 
-            // Color splash animation on success
+            // Color splash animation
             const splash = document.createElement('div');
             splash.className = 'submit-splash';
             formRef.current.appendChild(splash);
-            
-            gsap.fromTo(splash, 
-                { scale: 0, opacity: 1 }, 
-                { scale: 5, opacity: 0, duration: 1.5, ease: 'power2.out', onComplete: () => splash.remove() }
+
+            gsap.fromTo(
+                splash,
+                { scale: 0, opacity: 1 },
+                {
+                    scale: 5,
+                    opacity: 0,
+                    duration: 1.5,
+                    ease: 'power2.out',
+                    onComplete: () => splash.remove()
+                }
             );
 
         } catch (error) {
             console.error('RSVP Error:', error);
-            setStatus({ 
-                type: 'error', 
-                message: error.response?.data?.error || 'Failed to submit RSVP. Please try again later.' 
+            setStatus({
+                type: 'error',
+                message:
+                    error.response?.data?.error ||
+                    'Failed to submit RSVP. Please try again later.'
             });
         } finally {
             setIsSubmitting(false);
