@@ -51,7 +51,7 @@ const InvitationCard = () => {
           <div className="event-details">
             <div className="detail-item">
               <span className="icon">📅</span>
-              <p>March 14, 2026</p>
+              <p>March 22, 2027</p>
             </div>
             <div className="detail-item">
               <span className="icon">⏰</span>
@@ -59,7 +59,7 @@ const InvitationCard = () => {
             </div>
             <div className="detail-item">
               <span className="icon">📍</span>
-              <p>Festivity Grounds, Hyderabad</p>
+              <p>Festivity Grounds, Guntur</p>
             </div>
           </div>
 
